@@ -1,4 +1,5 @@
 import { Component, ViewChild, ElementRef } from "@angular/core";
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 
 @Component({
   selector: "app-root",
@@ -9,6 +10,9 @@ export class AppComponent {
   @ViewChild("fileDropRef", { static: false }) fileDropEl: ElementRef;
   files: any[] = [];
 
+  constructor(private http: HttpClient) {
+
+  }
   /**
    * on file drop handler
    */
@@ -82,5 +86,20 @@ export class AppComponent {
     const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  }
+
+  uploadFile() {
+    let formData = new FormData();
+    formData.append("file", this.files[0], this.files[0].name);
+    formData.append("password", "abcd");
+    let headers = new HttpHeaders({
+      'Content-Type': 'multipart/form-data;',
+      'Accept': '*/*'
+    });
+    let options = { headers: headers, formData: formData };
+    this.http.post('http://localhost:8080/jks/uploadFile', formData)
+      .subscribe((response) => {
+        console.log('response received is ', response);
+      })
   }
 }
